@@ -20,18 +20,18 @@ public sealed class NitroTypeApiClient
             _lastQueriedAt = DateTime.UtcNow;
         }
 
-        return _cache.results.season.Select(cat => new CatInfo(cat.Name, cat.Precision));
+        return _cache.results.season;
     }
 }
 
-public sealed record CatInfo(string Name, decimal Accuracy);
-
 public sealed record ApiData(ApiResults results);
 
-public sealed record ApiResults(ApiSeason[] season);
+public sealed record ApiResults(CatInfo[] season);
 
-public sealed record ApiSeason(string username, string displayName, long typed, long errs)
+public sealed record CatInfo(string username, string displayName, long typed, long errs, long played, long secs)
 {
     public string Name => string.IsNullOrWhiteSpace(displayName) ? username : displayName;
-    public decimal Precision => 100m * (typed - errs) / typed;
+    public decimal Accuracy => 100m * (typed - errs) / typed;
+    public decimal AverageTextLength => (decimal)typed / played;
+    public decimal AverageSpeed => (60m / 5) * typed / secs;
 }

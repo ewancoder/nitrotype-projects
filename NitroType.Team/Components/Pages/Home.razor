@@ -6,21 +6,29 @@
     <h1>Current season statistics</h1>
     <img alt="cat" src="cat.webp"/>
 
+    <p>Necessary text length for 1 error leaving 100% accuracy: <span style="font-weight: bold;">192</span> (or 90 WPM)</p>
+
     <table class="cats-table">
         <thead>
         <tr>
             <th>Cat name</th>
             <th>Accuracy</th>
+            <th>Average speed</th>
+            <th>Average text length</th>
+            <th>Characters typed</th>
         </tr>
         </thead>
         <tbody>
         @foreach (var cat in cats)
-        {
-            <tr>
+    {
+        <tr>
                 <td>@cat.Name</td>
                 <td>@cat.Accuracy.ToString("#.####")</td>
+                <td>@cat.AverageSpeed.ToString("#.##")</td>
+                <td>@cat.AverageTextLength.ToString("#.##")</td>
+                <td>@cat.typed</td>
             </tr>
-        }
+    }
         </tbody>
     </table>
 </div>
