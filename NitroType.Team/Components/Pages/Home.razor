@@ -15,7 +15,9 @@
             <th>Accuracy</th>
             <th>Average speed</th>
             <th>Average text length</th>
-            <th>Characters typed</th>
+            <th>Characters typed (errors)</th>
+            <th>Races</th>
+            <th>Time spent</th>
         </tr>
         </thead>
         <tbody>
@@ -23,10 +25,12 @@
     {
         <tr>
                 <td>@cat.Name</td>
-                <td>@cat.Accuracy.ToString("#.####")</td>
+                <td>@cat.Accuracy.ToString("#.####") <span class="@cat.AccuracyClass">@cat.AccuracyImprovementString</span></td>
                 <td>@cat.AverageSpeed.ToString("#.##")</td>
                 <td>@cat.AverageTextLength.ToString("#.##")</td>
-                <td>@cat.typed</td>
+                <td>@cat.typed (@cat.errs)</td>
+                <td>@cat.played</td>
+                <td>@cat.TimeSpent</td>
             </tr>
     }
         </tbody>
