@@ -1,0 +1,36 @@
+﻿@page "/"
+@inject NitroTypeApiClient NitroTypeApiClient
+
+<div style="margin: 0 auto; text-align: center;">
+    <h1 style="color: red">Keyboard Elite Cats [KECATS]</h1>
+    <h1>Current season statistics</h1>
+    <img alt="cat" src="cat.webp"/>
+
+    <table class="cats-table">
+        <thead>
+        <tr>
+            <th>Cat name</th>
+            <th>Accuracy</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var cat in cats)
+        {
+            <tr>
+                <td>@cat.Name</td>
+                <td>@cat.Accuracy.ToString("#.####")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private IEnumerable<CatInfo> cats = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        cats = (await NitroTypeApiClient.GetCatsInfoAsync())
+            .OrderByDescending(c => c.Accuracy);
+    }
+}
