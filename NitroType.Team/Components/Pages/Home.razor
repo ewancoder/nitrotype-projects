@@ -25,8 +25,8 @@
     {
         <tr>
                 <td>@cat.Name</td>
-                <td>@cat.Accuracy.ToString("#.####") <span class="@cat.AccuracyClass">@cat.AccuracyImprovementString</span></td>
-                <td>@cat.AverageSpeed.ToString("#.##")</td>
+                <td>@cat.Accuracy.ToString("#.####") <span class="@cat.GetDeltaClass(cat.AccuracyImprovement)">@cat.AccuracyImprovementString</span></td>
+                <td>@cat.AverageSpeed.ToString("#.##") <span class="@cat.GetDeltaClass(cat.AverageSpeedImprovement)">@cat.AverageSpeedImprovementString</span></td>
                 <td>@cat.AverageTextLength.ToString("#.##")</td>
                 <td>@cat.typed (@cat.errs)</td>
                 <td>@cat.played</td>

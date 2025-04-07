@@ -34,6 +34,7 @@ public sealed class NitroTypeApiClient
             if (previous != null)
             {
                 catInfo.AccuracyImprovement = catInfo.Accuracy - previous.Accuracy;
+                catInfo.AverageSpeedImprovement = catInfo.AverageSpeed - previous.AverageSpeed;
             }
         }
 
@@ -52,6 +53,7 @@ public sealed record CatInfo(string username, string displayName, long typed, lo
     public decimal AverageTextLength => (decimal)typed / played;
     public decimal AverageSpeed => (60m / 5) * typed / secs;
     public decimal AccuracyImprovement { get; set; } = 0m;
+    public decimal AverageSpeedImprovement { get; set; } = 0m;
 
     public string TimeSpent
     {
@@ -83,13 +85,21 @@ public sealed record CatInfo(string username, string displayName, long typed, lo
         }
     }
 
-    public string AccuracyClass
+    public string AverageSpeedImprovementString
     {
         get
         {
-            if (AccuracyImprovement > 0) return "good";
-            if (AccuracyImprovement < 0) return "bad";
+            if (AverageSpeedImprovement > 0) return $"\u25b2 {AverageSpeedImprovement.ToString("#.#####")}";
+            if (AverageSpeedImprovement < 0) return $"\u25bc {(-AverageSpeedImprovement).ToString("#.#####")}";
+
             return string.Empty;
         }
+    }
+
+    public string GetDeltaClass(decimal value)
+    {
+        if (value > 0) return "good";
+        if (value < 0) return "bad";
+        return string.Empty;
     }
 }
