@@ -28,7 +28,7 @@ public sealed class NitroTypeApiClient
             _previousDataQueriedAt = DateTime.UtcNow;
         }
 
-        foreach (var catInfo in _cache.results.season)
+        /*foreach (var catInfo in _cache.results.season)
         {
             var previous = _previousData.results.season.FirstOrDefault(x => x.username == catInfo.username);
             if (previous != null)
@@ -36,7 +36,7 @@ public sealed class NitroTypeApiClient
                 catInfo.AccuracyImprovement = catInfo.Accuracy - previous.Accuracy;
                 catInfo.AverageSpeedImprovement = catInfo.AverageSpeed - previous.AverageSpeed;
             }
-        }
+        }*/
 
         return _cache.results.season;
     }
