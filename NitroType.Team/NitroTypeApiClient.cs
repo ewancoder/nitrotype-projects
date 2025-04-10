@@ -56,8 +56,8 @@ public sealed class NitroTypeApiClient
                 {
                     Accuracy = cat.Accuracy - previousCat.Accuracy,
                     Speed = cat.AverageSpeed - previousCat.AverageSpeed,
-                    CharactersTyped = cat.typed - previousCat.typed,
-                    Races = cat.played - previousCat.played
+                    CharactersTyped = cat.typed == null || previousCat.typed == null ? 0 : cat.typed.Value - previousCat.typed.Value,
+                    Races = cat.played == null || previousCat.played == null ? 0 : cat.played.Value - previousCat.played.Value
                 }
             };
         }).ToList();
@@ -80,12 +80,12 @@ public sealed record ApiData(ApiResults results)
 
 public sealed record ApiResults(CatInfo[] season);
 
-public sealed record CatInfo(string username, string displayName, long typed, long errs, long played, long secs)
+public sealed record CatInfo(string username, string displayName, long? typed, long? errs, long? played, long? secs)
 {
     public string Name => string.IsNullOrWhiteSpace(displayName) ? username : displayName;
-    public decimal Accuracy => 100m * (typed - errs) / typed;
-    public decimal AverageTextLength => (decimal)typed / played;
-    public decimal AverageSpeed => (60m / 5) * typed / secs;
+    public decimal Accuracy => typed == null || errs == null ? 0m : 100m * (typed.Value - errs.Value) / typed.Value;
+    public decimal AverageTextLength => typed == null || played == null ? 0m : (decimal)typed.Value / played.Value;
+    public decimal AverageSpeed => typed == null || secs == null ? 0 : (60m / 5) * typed.Value / secs.Value;
 
     public Delta CurrentDelta { get; set; }
 
@@ -93,7 +93,7 @@ public sealed record CatInfo(string username, string displayName, long typed, lo
     {
         get
         {
-            var time = TimeSpan.FromSeconds(secs);
+            var time = secs == null ? TimeSpan.Zero : TimeSpan.FromSeconds(secs.Value);
             var parts = new List<string>();
             if (time.Days > 0)
                 parts.Add($"{time.Days} day{(time.Days > 1 ? "s" : "")}");
