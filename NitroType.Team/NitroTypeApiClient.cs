@@ -47,7 +47,7 @@ public sealed class NitroTypeApiClient
         var result = _data.Last().results.season.Select(cat =>
         {
             var previousCat = previous.results.season.FirstOrDefault(x => x.username == cat.username);
-            if (previous == null)
+            if (previousCat == null)
                 return cat with { CurrentDelta = new() };
 
             return cat with
@@ -86,8 +86,6 @@ public sealed record CatInfo(string username, string displayName, long typed, lo
     public decimal Accuracy => 100m * (typed - errs) / typed;
     public decimal AverageTextLength => (decimal)typed / played;
     public decimal AverageSpeed => (60m / 5) * typed / secs;
-    public decimal AccuracyImprovement { get; set; } = 0m;
-    public decimal AverageSpeedImprovement { get; set; } = 0m;
 
     public Delta CurrentDelta { get; set; }
 
