@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 
 namespace NitroType.Team;
@@ -31,7 +32,7 @@ public sealed class NitroTypeApiClient
         var apiData = JsonSerializer.Deserialize<TntApiRecord[]>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
             ?? throw new InvalidOperationException("Could not deserialize response from NitroType.");
 
-        var dx = apiData.Select(x => new CatInfo(x.Username, x.Name, x.Typed, x.Errors, x.RacesPlayed, x.Secs)).ToList();
+        var dx = apiData.Select(x => new CatInfo(x.Username, x.Name, x.Typed, x.Errors, x.RacesPlayed, x.Secs, x.AccuracyDiff, x.AverageSpeedDiff)).ToList();
 
         return dx;
     }
@@ -49,7 +50,10 @@ public sealed record TntApiRecord(
     decimal Accuracy,
     decimal AverageTextLength,
     decimal AverageSpeed,
-    string TimeSpent);
+    string TimeSpent,
+    decimal AccuracyDiff,
+    decimal AverageSpeedDiff,
+    decimal RacesPlayedDiff);
 
 public sealed record ApiData(ApiResults results)
 {
@@ -58,7 +62,7 @@ public sealed record ApiData(ApiResults results)
 
 public sealed record ApiResults(CatInfo[] season);
 
-public sealed record CatInfo(string username, string displayName, long typed, long errs, long played, long secs)
+public sealed record CatInfo(string username, string displayName, long typed, long errs, long played, long secs, decimal AccuracyDiff, decimal AverageSpeedDiff)
 {
     public string Name => string.IsNullOrWhiteSpace(displayName) ? username : displayName;
     public decimal Accuracy => typed == 0 ? 0 : 100m * (typed - errs) / typed;
@@ -66,6 +70,27 @@ public sealed record CatInfo(string username, string displayName, long typed, lo
     // ReSharper disable once ArrangeRedundantParentheses
     public decimal AverageSpeed => secs == 0 ? 0 : (60m / 5) * typed / secs;
 
+    public string AccuracyDiffText
+    {
+        get
+        {
+            if (AccuracyDiff == 0) return string.Empty;
+
+            var icon = AccuracyDiff > 0 ? "\u25b2" : "\u25bc";
+            return $"{icon} {Math.Abs(AccuracyDiff):#.####}";
+        }
+    }
+
+    public string AverageSpeedDiffText
+    {
+        get
+        {
+            if (AverageSpeedDiff == 0) return string.Empty;
+
+            var icon = AverageSpeedDiff > 0 ? "\u25b2" : "\u25bc";
+            return $"{icon} {Math.Abs(AverageSpeedDiff):#.####}";
+        }
+    }
 
     public Delta CurrentDelta { get; set; }
 

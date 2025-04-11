@@ -10,7 +10,7 @@
 
     <!--<p>Necessary text length for 1 error leaving 100% accuracy: <span style="font-weight: bold;">192</span> (or 90 WPM)</p>-->
     <!--<p>Statistics is updated every 1-5 minutes, difference is highlighted over the last 24 hours. Table is ordered by Accuracy.</p>-->
-    <p>Statistics is updated every 1-5 minutes. Table is ordered by Accuracy.</p>
+    <p>Statistics is updated every 1-5 minutes. Table is ordered by Accuracy. Diffs are based on last 24 hours.</p>
 
     <table class="cats-table">
         <thead>
@@ -29,8 +29,8 @@
     {
         <tr>
                 <td>@cat.Name</td>
-                <td>@cat.Accuracy.ToString("#.####")</td>
-                <td>@cat.AverageSpeed.ToString("#.##")</td>
+                <td>@cat.Accuracy.ToString("#.####") <span class="diff @(cat.AccuracyDiff > 0 ? "good" : "bad")">@cat.AccuracyDiffText</span></td>
+                <td>@cat.AverageSpeed.ToString("#.##") <span class="diff @(cat.AverageSpeedDiff > 0 ? "good" : "bad")">@cat.AverageSpeedDiffText</span></td>
                 <td>@cat.AverageTextLength.ToString("#.##")</td>
                 <td>@cat.typed (@cat.errs)</td>
                 <td>@cat.played</td>
