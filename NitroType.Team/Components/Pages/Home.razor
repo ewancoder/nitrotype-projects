@@ -28,12 +28,12 @@
         @foreach (var cat in cats)
     {
         <tr>
-                <td>@cat.Name</td>
+                <td class="@cat.GetRacesClass()" title="You are @(cat.GetRacesClass().ToUpperInvariant())!">@cat.Name</td>
                 <td>@cat.Accuracy.ToString("#.####") <span class="diff @(cat.AccuracyDiff > 0 ? "good" : "bad")">@cat.AccuracyDiffText</span></td>
                 <td>@cat.AverageSpeed.ToString("#.##") <span class="diff @(cat.AverageSpeedDiff > 0 ? "good" : "bad")">@cat.AverageSpeedDiffText</span></td>
                 <td>@cat.AverageTextLength.ToString("#.##")</td>
                 <td>@cat.typed (@cat.errs)</td>
-                <td>@cat.played</td>
+                <td class="@cat.GetRacesClass()" title="You are @(cat.GetRacesClass())!">@cat.played</td>
                 <td>@cat.TimeSpent</td>
             </tr>
     }

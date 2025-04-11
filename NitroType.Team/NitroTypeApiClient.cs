@@ -121,6 +121,17 @@ public sealed record CatInfo(string username, string displayName, long typed, lo
     }
 
 
+    public string GetRacesClass()
+    {
+        if (played >= 2000) return "thebest";
+        if (played >= 1000) return "awesome";
+        if (played >= 500) return "epic";
+        if (played >= 250) return "unique";
+        if (played >= 100) return "rare";
+        if (played >= 30) return "magic";
+
+        return "getting there";
+    }
 }
 
 public sealed record Delta
