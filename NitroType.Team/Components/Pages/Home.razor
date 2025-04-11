@@ -3,12 +3,14 @@
 
 <div style="margin: 0 auto; text-align: center;">
     <h1 style="color: red">Keyboard Elite Cats [KECATS]</h1>
-    <p>We type as precise as cats do!</p>
-    <h1>Current season statistics</h1>
+    <h2>We type as accurate as cats do!</h2>
+    <h1>Current league season statistics</h1>
+    <h3>Started on April 10</h3>
     <img alt="cat" src="cat.webp"/>
 
     <!--<p>Necessary text length for 1 error leaving 100% accuracy: <span style="font-weight: bold;">192</span> (or 90 WPM)</p>-->
-    <p>Statistics is updated every 1-5 minutes, difference is highlighted over the last 24 hours.</p>
+    <!--<p>Statistics is updated every 1-5 minutes, difference is highlighted over the last 24 hours. Table is ordered by Accuracy.</p>-->
+    <p>Statistics is updated every 1-5 minutes. Table is ordered by Accuracy.</p>
 
     <table class="cats-table">
         <thead>
@@ -27,11 +29,11 @@
     {
         <tr>
                 <td>@cat.Name</td>
-                <td>@cat.Accuracy.ToString("#.####") <span class="@cat.GetDeltaClass(cat.CurrentDelta.Accuracy)">@cat.CurrentDelta.AccuracyString</span></td>
-                <td>@cat.AverageSpeed.ToString("#.##") <span class="@cat.GetDeltaClass(cat.CurrentDelta.Speed)">@cat.CurrentDelta.SpeedString</span></td>
+                <td>@cat.Accuracy.ToString("#.####")</td>
+                <td>@cat.AverageSpeed.ToString("#.##")</td>
                 <td>@cat.AverageTextLength.ToString("#.##")</td>
-                <td>@cat.typed (@cat.errs) <span class="@cat.GetDeltaClass(cat.CurrentDelta.CharactersTyped)">@cat.CurrentDelta.CharactersTypedString</span></td>
-                <td>@cat.played <span class="@cat.GetDeltaClass(cat.CurrentDelta.Races)">@cat.CurrentDelta.RacesString</span></td>
+                <td>@cat.typed (@cat.errs)</td>
+                <td>@cat.played</td>
                 <td>@cat.TimeSpent</td>
             </tr>
     }
@@ -45,6 +47,8 @@
     protected override async Task OnInitializedAsync()
     {
         cats = (await NitroTypeApiClient.GetCatsInfoAsync())
+            //.Where(c => c.username != "keyboard_elite_cat" && c.username != "ewancoder")
+            .Where(c => c.username != "keyboard_elite_cat")
             .OrderByDescending(c => c.Accuracy);
     }
 }

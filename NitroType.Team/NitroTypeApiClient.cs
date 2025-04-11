@@ -4,9 +4,6 @@ namespace NitroType.Team;
 
 public sealed class NitroTypeApiClient
 {
-    private List<ApiData> _data = [];
-    private static readonly TimeSpan _deltaInterval = TimeSpan.FromDays(1);
-
     public NitroTypeApiClient()
     {
         _ = Task.Run(async () =>
@@ -28,50 +25,31 @@ public sealed class NitroTypeApiClient
 
     public async ValueTask<IEnumerable<CatInfo>> GetCatsInfoAsync()
     {
-        if (_data.Count == 0 || DateTime.UtcNow - _data.Last().Timestamp > TimeSpan.FromMinutes(1))
-        {
-            var client = new HttpClient();
-            var data = await client.GetAsync("https://www.nitrotype.com/api/v2/teams/KECATS");
-            var json = await data.Content.ReadAsStringAsync();
-            var apiData = JsonSerializer.Deserialize<ApiData>(json)
-                ?? throw new InvalidOperationException("Could not deserialize response from NitroType.");
+        var client = new HttpClient();
+        var data = await client.GetAsync("https://api.tnt.typingrealm.com/api/statistics/kecats");
+        var json = await data.Content.ReadAsStringAsync();
+        var apiData = JsonSerializer.Deserialize<TntApiRecord[]>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? throw new InvalidOperationException("Could not deserialize response from NitroType.");
 
-            apiData.Timestamp = DateTime.UtcNow;
-            _data.Add(apiData);
-        }
+        var dx = apiData.Select(x => new CatInfo(x.Username, x.Name, x.Typed, x.Errors, x.RacesPlayed, x.Secs)).ToList();
 
-        var previous = _data.Where(x => x.Timestamp < DateTime.UtcNow - _deltaInterval).FirstOrDefault();
-        if (previous == null) previous = _data.First();
-        var current = _data.Last();
-
-        var result = _data.Last().results.season.Select(cat =>
-        {
-            var previousCat = previous.results.season.FirstOrDefault(x => x.username == cat.username);
-            if (previousCat == null)
-                return cat with { CurrentDelta = new() };
-
-            return cat with
-            {
-                CurrentDelta = new Delta
-                {
-                    Accuracy = cat.Accuracy - previousCat.Accuracy,
-                    Speed = cat.AverageSpeed - previousCat.AverageSpeed,
-                    CharactersTyped = cat.typed == null || previousCat.typed == null ? 0 : cat.typed.Value - previousCat.typed.Value,
-                    Races = cat.played == null || previousCat.played == null ? 0 : cat.played.Value - previousCat.played.Value
-                }
-            };
-        }).ToList();
-
-        if (result.Any(x => x.CurrentDelta.CharactersTyped < 0))
-        {
-            Console.WriteLine("Erasing season, it has ended.");
-            _data = [];
-            return await GetCatsInfoAsync();
-        }
-
-        return result;
+        return dx;
     }
 }
+
+public sealed record TntApiRecord(
+    string Username,
+    string Team,
+    long Typed,
+    long Errors,
+    string Name,
+    long RacesPlayed,
+    DateTime Timestamp,
+    long Secs,
+    decimal Accuracy,
+    decimal AverageTextLength,
+    decimal AverageSpeed,
+    string TimeSpent);
 
 public sealed record ApiData(ApiResults results)
 {
@@ -80,12 +58,14 @@ public sealed record ApiData(ApiResults results)
 
 public sealed record ApiResults(CatInfo[] season);
 
-public sealed record CatInfo(string username, string displayName, long? typed, long? errs, long? played, long? secs)
+public sealed record CatInfo(string username, string displayName, long typed, long errs, long played, long secs)
 {
     public string Name => string.IsNullOrWhiteSpace(displayName) ? username : displayName;
-    public decimal Accuracy => typed == null || errs == null ? 0m : 100m * (typed.Value - errs.Value) / typed.Value;
-    public decimal AverageTextLength => typed == null || played == null ? 0m : (decimal)typed.Value / played.Value;
-    public decimal AverageSpeed => typed == null || secs == null ? 0 : (60m / 5) * typed.Value / secs.Value;
+    public decimal Accuracy => typed == 0 ? 0 : 100m * (typed - errs) / typed;
+    public decimal AverageTextLength => played == 0 ? 0 : (decimal)typed / played;
+    // ReSharper disable once ArrangeRedundantParentheses
+    public decimal AverageSpeed => secs == 0 ? 0 : (60m / 5) * typed / secs;
+
 
     public Delta CurrentDelta { get; set; }
 
@@ -93,7 +73,7 @@ public sealed record CatInfo(string username, string displayName, long? typed, l
     {
         get
         {
-            var time = secs == null ? TimeSpan.Zero : TimeSpan.FromSeconds(secs.Value);
+            var time = secs == null ? TimeSpan.Zero : TimeSpan.FromSeconds(secs);
             var parts = new List<string>();
             if (time.Days > 0)
                 parts.Add($"{time.Days} day{(time.Days > 1 ? "s" : "")}");
